@@ -1,0 +1,27 @@
+# Define the subnets you want to scan
+$subnets = @("10.35.246", "10.21.246")
+
+# Create an empty array to collect results
+$results = @()
+
+# Loop through each subnet
+foreach ($subnet in $subnets) {
+    for ($i = 10; $i -le 255; $i++) {
+        $ip = "$subnet.$i"
+        Write-Host "Pinging $ip..."
+        
+        # Ping the IP
+        $status = Test-Connection -ComputerName $ip -Count 1 -Quiet
+
+        # Store the result
+        $results += [PSCustomObject]@{
+            IPAddress = $ip
+            Reachable = $status
+        }
+    }
+}
+
+# Export results to CSV (Excel-friendly)
+$results | Export-Csv -Path "MultiSubnet_PingResults.csv" -NoTypeInformation
+
+Write-Host "`nScan complete. Results saved to 'MultiSubnet_PingResults.csv'"
